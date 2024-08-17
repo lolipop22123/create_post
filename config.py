@@ -6,6 +6,8 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from dotenv import load_dotenv
 
+from db.db import DB
+
 load_dotenv()
 
 TOKEN = os.getenv('TOKEN')
@@ -18,4 +20,4 @@ dp =Dispatcher(bot, storage = storage)
 dp.middleware.setup(LoggingMiddleware())
 
 #DB
-# db = DB('calendar', 'postgres', '1111', 'localhost')
+db = DB('botpost', 'postgres', '1111', 'localhost')
