@@ -9,12 +9,20 @@ class DB:
 
     def create(self):
         with self.connection:
-            self.cursor.execute('''CREATE TABLE public.post
+            # self.cursor.execute('''CREATE TABLE public.post
+            #     (
+            #         id serial NOT NULL,
+            #         id_post bigint,
+            #         text character varying,
+            #         photo_ids TEXT[] NOT NULL,
+            #         PRIMARY KEY (id)
+            #     );''')
+            
+            self.cursor.execute('''CREATE TABLE public.channel_posting
                 (
                     id serial NOT NULL,
-                    id_post bigint,
-                    text character varying,
-                    photo_ids TEXT[] NOT NULL,
+                    name character varying,
+                    id_channel bigint,
                     PRIMARY KEY (id)
                 );''')
             
