@@ -98,6 +98,7 @@ class DB:
             # Возвращаем все записи
             return results
     
+    
     def delete_channel_posting(self, id_channel):
         with self.connection:
             # Выполнение запроса на удаление записи из таблицы по ID
@@ -113,3 +114,102 @@ class DB:
             self.connection.commit()
 
             
+    def add_plan_posting(self, id_post, time, channel_post, day_post):
+        self.cursor.execute('''
+            INSERT INTO public.planPosting (id_post, time, channel_post, day_post)
+            VALUES (%s, %s, %s, %s)
+            RETURNING id;
+        ''', (id_post, time, channel_post, day_post))
+        
+        self.connection.commit()  # Сохранение изменений
+    
+    
+    def get_all_plan_postings(self):
+        self.cursor.execute('''
+            SELECT * FROM public.planPosting;
+        ''')
+        
+        # Получаем все записи
+        records = self.cursor.fetchall()
+        return records
+    
+    
+    def delete_plan_posting(self, id_post):
+        self.cursor.execute('''
+            DELETE FROM public.planPosting WHERE id_post = %s;
+        ''', (id_post,))
+        
+        self.connection.commit()  # Сохранение изменений
+    
+    
+    def get_post_text(self, id_post):
+        self.cursor.execute('''
+            SELECT text 
+            FROM public.post 
+            WHERE id_post = %s;
+        ''', (id_post,))
+        
+        result = self.cursor.fetchone()
+        if result:
+            return result[0]
+        else:
+            return None  # Если текст не найден
+        
+    
+    def add_reposting(self, name, id_copy, id_posting):
+        self.cursor.execute('''
+            INSERT INTO public.reposting (name, id_copy, id_posting)
+            VALUES (%s, %s, %s)
+            RETURNING id;
+        ''', (name, id_copy, id_posting))
+        
+        self.connection.commit()  # Сохранение изменений
+    
+    def get_all_repostings(self):
+        self.cursor.execute('''
+            SELECT * FROM public.reposting;
+        ''')
+        
+        # Получаем все строки из результата запроса
+        repostings = self.cursor.fetchall()
+        
+        return repostings
+
+    
+    # Отправленные посты
+    def add_sent_post(self, post_id, chat_id):
+        with self.connection:
+            self.cursor.execute(
+                '''
+                INSERT INTO public.sent_posts (post_id, chat_id, send_date)
+                VALUES (%s, %s, CURRENT_DATE)
+                RETURNING id;
+                ''',
+                (post_id, chat_id)
+            )
+            self.connection.commit()
+    
+    def is_post_sent_today(self, post_id, chat_id):
+        with self.connection:
+            self.cursor.execute(
+                '''
+                SELECT id FROM public.sent_posts
+                WHERE post_id = %s AND chat_id = %s AND send_date = CURRENT_DATE;
+                ''',
+                (post_id, chat_id)
+            )
+            result = self.cursor.fetchone()
+            return result is not None
+
+    
+    def clear_sent_posts(self):
+        with self.connection:
+            self.cursor.execute(
+                '''
+                DELETE FROM public.sent_posts;
+                '''
+            )
+            self.connection.commit()
+
+
+    

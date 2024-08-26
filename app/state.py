@@ -14,3 +14,13 @@ class addChannel(StatesGroup):
 
 class timePosting(StatesGroup):
     time = State()
+
+
+class reposting(StatesGroup):
+    name = State()
+    idCopy = State()
+    idPosting = State()
+    
+    
+class CreateSession(StatesGroup):
+    waiting_for_file = State()
